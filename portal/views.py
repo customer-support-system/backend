@@ -199,6 +199,8 @@
 
 #             return response
 
+# using viewsets
+
 from rest_framework import viewsets
 from rest_framework.decorators import action
 from rest_framework.response import Response
@@ -218,48 +220,31 @@ class ComplaintViewSet(viewsets.ModelViewSet):
     serializer_class = ComplaintSerializer
     permission_classes = [AllowAny]
 
-    @action(detail=True, methods=['get'])
-    def details(self, request, pk=None):
-        complaint = self.get_object()
-        serializer = self.get_serializer(complaint)
-        return Response({"message": "complaint details", "data": serializer.data})
+
+    def get_queryset(self):
+        # Get the email from the request object
+        email = self.request.query_params.get('email', None)
+        if email:
+            # Filter queryset based on email
+            return self.queryset.filter(user__email=email)
+        else:
+            return self.queryset
+
 
 class LevelViewSet(viewsets.ModelViewSet):
     queryset = Levels.objects.all()
     serializer_class = LevelSerializer
 
-    @action(detail=True, methods=['get'])
-    def details(self, request, pk=None):
-        level = self.get_object()
-        serializer = self.get_serializer(level)
-        return Response({"message": "level details", "data": serializer.data})
 
 class SolutionViewSet(viewsets.ModelViewSet):
     queryset = Solution.objects.all()
     serializer_class = SolutionSerializer
     permission_classes = [IsAuthenticated]
 
-    @action(detail=True, methods=['get'])
-    def details(self, request, pk=None):
-        solution = self.get_object()
-        serializer = self.get_serializer(solution)
-        return Response({"message": "solution details", "data": serializer.data})
 
 class StaffViewSet(viewsets.ModelViewSet):
     queryset = Staff.objects.all()
     serializer_class = StaffSerializer
-
-    @action(detail=True, methods=['get'])
-    def details(self, request, pk=None):
-        staff = self.get_object()
-        serializer = self.get_serializer(staff)
-        return Response({"message": "staff details", "data": serializer.data})
-
-    @action(detail=False, methods=['get'])
-    def list_staff(self, request):
-        staffs = self.get_queryset()
-        serializer = self.get_serializer(staffs, many=True)
-        return Response({"message": "list of staff members", "data": serializer.data})
 
 
 class LoginView(TokenObtainPairView):

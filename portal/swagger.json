@@ -1,0 +1,685 @@
+{
+    "openapi": "3.0.0",
+    "info": {
+      "title": "API for Complaints, Levels, Solutions, Staff, and Authentication Management",
+      "description": "API for managing complaints, levels, solutions, staff, and authentication",
+      "version": "1.0.0"
+    },
+    "paths": {
+      "/complaints": {
+        "get": {
+          "summary": "List all complaints",
+          "description": "Retrieve a list of all complaints.",
+          "responses": {
+            "200": {
+              "description": "A list of complaints",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "type": "array",
+                    "items": {
+                      "$ref": "#/components/schemas/Complaint"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "post": {
+          "summary": "Create a new complaint",
+          "description": "Create a new complaint.",
+          "requestBody": {
+            "required": true,
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Complaint"
+                }
+              }
+            }
+          },
+          "responses": {
+            "201": {
+              "description": "Complaint created successfully",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "$ref": "#/components/schemas/Complaint"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "/complaints/{id}": {
+          "get": {
+            "summary": "Retrieve a complaint",
+            "description": "Retrieve details of a specific complaint.",
+            "parameters": [
+              {
+                "name": "id",
+                "in": "path",
+                "required": true,
+                "schema": {
+                  "type": "integer"
+                },
+                "description": "ID of the complaint to retrieve"
+              }
+            ],
+            "responses": {
+              "200": {
+                "description": "Complaint details",
+                "content": {
+                  "application/json": {
+                    "schema": {
+                      "$ref": "#/components/schemas/Complaint"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "put": {
+            "summary": "Update a complaint",
+            "description": "Update details of a specific complaint.",
+            "parameters": [
+              {
+                "name": "id",
+                "in": "path",
+                "required": true,
+                "schema": {
+                  "type": "integer"
+                },
+                "description": "ID of the complaint to update"
+              }
+            ],
+            "requestBody": {
+              "required": true,
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "$ref": "#/components/schemas/Complaint"
+                  }
+                }
+              }
+            },
+            "responses": {
+              "200": {
+                "description": "Complaint updated successfully",
+                "content": {
+                  "application/json": {
+                    "schema": {
+                      "$ref": "#/components/schemas/Complaint"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "delete": {
+            "summary": "Delete a complaint",
+            "description": "Delete a specific complaint.",
+            "parameters": [
+              {
+                "name": "id",
+                "in": "path",
+                "required": true,
+                "schema": {
+                  "type": "integer"
+                },
+                "description": "ID of the complaint to delete"
+              }
+            ],
+            "responses": {
+              "204": {
+                "description": "Complaint deleted successfully"
+              }
+            }
+          }
+        }
+      },
+      "/levels": {
+        "get": {
+          "summary": "List all levels",
+          "description": "Retrieve a list of all levels.",
+          "responses": {
+            "200": {
+              "description": "A list of levels",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "type": "array",
+                    "items": {
+                      "$ref": "#/components/schemas/Level"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "post": {
+          "summary": "Create a new level",
+          "description": "Create a new level.",
+          "requestBody": {
+            "required": true,
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Level"
+                }
+              }
+            }
+          },
+          "responses": {
+            "201": {
+              "description": "Level created successfully",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "$ref": "#/components/schemas/Level"
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "/levels/{id}": {
+        "get": {
+          "summary": "Retrieve a level",
+          "description": "Retrieve details of a specific level.",
+          "parameters": [
+            {
+              "name": "id",
+              "in": "path",
+              "required": true,
+              "schema": {
+                "type": "integer"
+              },
+              "description": "ID of the level to retrieve"
+            }
+          ],
+          "responses": {
+            "200": {
+              "description": "Level details",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "$ref": "#/components/schemas/Level"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "put": {
+          "summary": "Update a level",
+          "description": "Update details of a specific level.",
+          "parameters": [
+            {
+              "name": "id",
+              "in": "path",
+              "required": true,
+              "schema": {
+                "type": "integer"
+              },
+              "description": "ID of the level to update"
+            }
+          ],
+          "requestBody": {
+            "required": true,
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Level"
+                }
+              }
+            }
+          },
+          "responses": {
+            "200": {
+              "description": "Level updated successfully",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "$ref": "#/components/schemas/Level"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "delete": {
+          "summary": "Delete a level",
+          "description": "Delete a specific level.",
+          "parameters": [
+            {
+              "name": "id",
+              "in": "path",
+              "required": true,
+              "schema": {
+                "type": "integer"
+              },
+              "description": "ID of the level to delete"
+            }
+          ],
+          "responses": {
+            "204": {
+              "description": "Level deleted successfully"
+            }
+          }
+        }
+      },
+      "/solutions": {
+        "get": {
+          "summary": "List all solutions",
+          "description": "Retrieve a list of all solutions.",
+          "responses": {
+            "200": {
+              "description": "A list of solutions",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "type": "array",
+                    "items": {
+                      "$ref": "#/components/schemas/Solution"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "post": {
+          "summary": "Create a new solution",
+          "description": "Create a new solution.",
+          "requestBody": {
+            "required": true,
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Solution"
+                }
+              }
+            }
+          },
+          "responses": {
+            "201": {
+              "description": "Solution created successfully",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "$ref": "#/components/schemas/Solution"
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "/solutions/{id}": {
+        "get": {
+          "summary": "Retrieve a solution",
+          "description": "Retrieve details of a specific solution.",
+          "parameters": [
+            {
+              "name": "id",
+              "in": "path",
+              "required": true,
+              "schema": {
+                "type": "integer"
+              },
+              "description": "ID of the solution to retrieve"
+            }
+          ],
+          "responses": {
+            "200": {
+              "description": "Solution details",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "$ref": "#/components/schemas/Solution"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "put": {
+          "summary": "Update a solution",
+          "description": "Update details of a specific solution.",
+          "parameters": [
+            {
+              "name": "id",
+              "in": "path",
+              "required": true,
+              "schema": {
+                "type": "integer"
+              },
+              "description": "ID of the solution to update"
+            }
+          ],
+          "requestBody": {
+            "required": true,
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Solution"
+                }
+              }
+            }
+          },
+          "responses": {
+            "200": {
+              "description": "Solution updated successfully",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "$ref": "#/components/schemas/Solution"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "delete": {
+          "summary": "Delete a solution",
+          "description": "Delete a specific solution.",
+          "parameters": [
+            {
+              "name": "id",
+              "in": "path",
+              "required": true,
+              "schema": {
+                "type": "integer"
+              },
+              "description": "ID of the solution to delete"
+            }
+          ],
+          "responses": {
+            "204": {
+              "description": "Solution deleted successfully"
+            }
+          }
+        }
+      },
+      "/staff": {
+        "get": {
+          "summary": "List all staff",
+          "description": "Retrieve a list of all staff members.",
+          "responses": {
+            "200": {
+              "description": "A list of staff members",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "type": "array",
+                    "items": {
+                      "$ref": "#/components/schemas/Staff"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "post": {
+          "summary": "Create a new staff member",
+          "description": "Create a new staff member.",
+          "requestBody": {
+            "required": true,
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Staff"
+                }
+              }
+            }
+          },
+          "responses": {
+            "201": {
+              "description": "Staff member created successfully",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "$ref": "#/components/schemas/Staff"
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "/staff/{id}": {
+        "get": {
+          "summary": "Retrieve a staff member",
+          "description": "Retrieve details of a specific staff member.",
+          "parameters": [
+            {
+              "name": "id",
+              "in": "path",
+              "required": true,
+              "schema": {
+                "type": "integer"
+              },
+              "description": "ID of the staff member to retrieve"
+            }
+          ],
+          "responses": {
+            "200": {
+              "description": "Staff member details",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "$ref": "#/components/schemas/Staff"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "put": {
+          "summary": "Update a staff member",
+          "description": "Update details of a specific staff member.",
+          "parameters": [
+            {
+              "name": "id",
+              "in": "path",
+              "required": true,
+              "schema": {
+                "type": "integer"
+              },
+              "description": "ID of the staff member to update"
+            }
+          ],
+          "requestBody": {
+            "required": true,
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Staff"
+                }
+              }
+            }
+          },
+          "responses": {
+            "200": {
+              "description": "Staff member updated successfully",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "$ref": "#/components/schemas/Staff"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "delete": {
+          "summary": "Delete a staff member",
+          "description": "Delete a specific staff member.",
+          "parameters": [
+            {
+              "name": "id",
+              "in": "path",
+              "required": true,
+              "schema": {
+                "type": "integer"
+              },
+              "description": "ID of the staff member to delete"
+            }
+          ],
+          "responses": {
+            "204": {
+              "description": "Staff member deleted successfully"
+            }
+          }
+        }
+      },
+      "/login": {
+        "post": {
+          "summary": "Authenticate user",
+          "description": "Authenticate a user and generate an access token.",
+          "requestBody": {
+            "required": true,
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "username": {
+                      "type": "string",
+                      "description": "The username of the user"
+                    },
+                    "password": {
+                      "type": "string",
+                      "description": "The password of the user"
+                    }
+                  },
+                  "required": ["username", "password"]
+                }
+              }
+            }
+          },
+          "responses": {
+            "200": {
+              "description": "User authenticated successfully",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "type": "object",
+                    "properties": {
+                      "access": {
+                        "type": "string",
+                        "description": "The access token for the user"
+                      },
+                      "refresh": {
+                        "type": "string",
+                        "description": "The refresh token for the user"
+                      },
+                      "message": {
+                        "type": "string",
+                        "description": "A message indicating successful login"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "components": {
+      "schemas": {
+        "Complaint": {
+          "type": "object",
+          "properties": {
+            "id": {
+              "type": "integer",
+              "format": "int64",
+              "description": "The complaint's unique identifier"
+            },
+            "description": {
+              "type": "string",
+              "description": "The description of the complaint"
+            },
+            "created_at": {
+              "type": "string",
+              "format": "date-time",
+              "description": "The date and time when the complaint was created"
+            }
+          }
+        },
+        "Level": {
+          "type": "object",
+          "properties": {
+            "id": {
+              "type": "integer",
+              "format": "int4",
+              "description": "The level's unique identifier"
+            },
+            "name": {
+              "type": "string",
+              "description": "The name of the level"
+            },
+            "description": {
+              "type": "string",
+              "description": "The description of the level"
+            },
+            "created_at": {
+              "type": "string",
+              "format": "date-time",
+              "description": "The date and time when the level was created"
+            }
+          }
+        },
+        "Solution": {
+          "type": "object",
+          "properties": {
+            "id": {
+              "type": "integer",
+              "format": "int64",
+              "description": "The solution's unique identifier"
+            },
+            "description": {
+              "type": "string",
+              "description": "The description of the solution"
+            },
+            "created_at": {
+              "type": "string",
+              "format": "date-time",
+              "description": "The date and time when the solution was created"
+            }
+          }
+        },
+        "Staff": {
+          "type": "object",
+          "properties": {
+            "id": {
+              "type": "integer",
+              "format": "int64",
+              "description": "The staff member's unique identifier"
+            },
+            "name": {
+              "type": "string",
+              "description": "The name of the staff member"
+            },
+            "role": {
+              "type": "string",
+              "description": "The role of the staff member"
+            },
+            "created_at": {
+              "type": "string",
+              "format": "date-time",
+              "description": "The date and time when the staff member was created"
+            }
+          }
+        }
+      }
+    }
+  }
+  
+  
