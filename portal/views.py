@@ -205,30 +205,58 @@ from rest_framework import viewsets
 from rest_framework.decorators import action
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated,AllowAny
-from rest_framework_simplejwt.views import TokenObtainPairView
 from rest_framework import status
 from rest_framework.request import Request
+from rest_framework_simplejwt.views import TokenObtainPairView
+from .serializers import CustomTokenObtainPairSerializer
 
 
 from .models import Issues, Levels, Solution, Staff
 from .serializers import (
     ComplaintSerializer, LevelSerializer, SolutionSerializer, StaffSerializer
 )
+from rest_framework.pagination import PageNumberPagination
+
+
+
+
+class CustomPagination(PageNumberPagination):
+    page_size = 10  
+    page_size_query_param = 'page_size'
+    max_page_size = 1000  
+
+
+
 
 class ComplaintViewSet(viewsets.ModelViewSet):
     queryset = Issues.objects.all()
     serializer_class = ComplaintSerializer
     permission_classes = [AllowAny]
-
+    pagination_class = CustomPagination
 
     def get_queryset(self):
-        # Get the email from the request object
-        email = self.request.query_params.get('email', None)
-        if email:
-            # Filter queryset based on email
-            return self.queryset.filter(user__email=email)
-        else:
-            return self.queryset
+        queryset = super().get_queryset()
+        # Filter complaints by status
+        status_filter = self.request.query_params.get('status', None)
+        if status_filter:
+            queryset = queryset.filter(status=status_filter)
+        return queryset
+
+
+
+    @action(detail=False)
+    def without_solutions(self, request):
+        queryset = Issues.objects.filter(status__in=['pending', 'answered']).exclude(solution__isnull=False)
+        page = self.paginate_queryset(queryset)
+        serializer = self.get_serializer(page, many=True)
+        return self.get_paginated_response(serializer.data)
+
+    @action(detail=False)
+    def pending(self, request):
+        queryset = Issues.objects.filter(status='pending')
+        page = self.paginate_queryset(queryset)
+        serializer = self.get_serializer(page, many=True)
+        return self.get_paginated_response(serializer.data)
 
 
 class LevelViewSet(viewsets.ModelViewSet):
@@ -240,18 +268,21 @@ class SolutionViewSet(viewsets.ModelViewSet):
     queryset = Solution.objects.all()
     serializer_class = SolutionSerializer
     permission_classes = [IsAuthenticated]
+    pagination_class=CustomPagination
 
 
 class StaffViewSet(viewsets.ModelViewSet):
     queryset = Staff.objects.all()
     serializer_class = StaffSerializer
+    pagination_class=CustomPagination
 
 
-class LoginView(TokenObtainPairView):
+class CustomTokenObtainPairView(TokenObtainPairView):
+    serializer_class = CustomTokenObtainPairSerializer
 
-    def post(self, request: Request, *args, **kwargs) -> Response:
-        response=super().post(request, *args, **kwargs)
-        if response.status_code==status.HTTP_200_OK:
-            response.data.update({'message': 'logged in successfully'})
+    
 
-            return response
+
+    
+
+

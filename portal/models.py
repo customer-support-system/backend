@@ -1,53 +1,41 @@
 from django.db import models
 from django.contrib.auth.models import AbstractUser,BaseUserManager,Permission,Group
+from django.contrib.auth.hashers import make_password
 
+class CustomUser(AbstractUser):
+    
+    pass
 
 class CustomUserManager(BaseUserManager):
     def create_user(self, username, password=None, **extra_fields):
         if not username:
             raise ValueError('The Username field must be set')
         user = self.model(username=username, **extra_fields)
-        user.set_password(password)
+        if password is not None:
+            user.set_password(password)
         user.save(using=self._db)
         return user
 
     def create_superuser(self, username, password=None, **extra_fields):
         extra_fields.setdefault('is_staff', True)
         extra_fields.setdefault('is_superuser', True)
+        if extra_fields.get('is_superuser') is not True:
+            raise ValueError('Superuser must have is_superuser=True.')
         return self.create_user(username, password, **extra_fields)
-
-class CustomUser(AbstractUser):
-    username = models.CharField(unique=True, max_length=30)
-
-    USERNAME_FIELD = 'username'
-    REQUIRED_FIELDS = []
-
-    objects = CustomUserManager()
+class IssueQuerySet(models.QuerySet):
+    def without_solutions(self):
+        return self.annotate(solution_count=models.Count('solution')).filter(solution_count=0)
     
-
-    def __str__(self):
-        return self.username
-
-    # Add the following lines to resolve the E304 error
-    user_permissions = models.ManyToManyField(
-        Permission,
-        verbose_name='user permissions',
-        blank=True,
-        related_name='custom_user_permissions',  # Change this to a unique name
-    )
-    groups = models.ManyToManyField(
-        Group,
-        verbose_name='groups',
-        blank=True,
-        related_name='custom_user_groups',  # Change this to a unique name
-    )
-
-# Create your models here.
 class Issues(models.Model):
     institution_name=models.CharField(max_length=100)
     email=models.EmailField()
     issue=models.CharField(max_length=200)
-
+    STATUS_CHOICES = (
+        ('pending', 'Pending'),
+        ('answered', 'Answered'),
+    )
+    status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='pending')
+    
     def __str__(self):
      return self.institution_name
 

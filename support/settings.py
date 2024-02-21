@@ -61,7 +61,7 @@ REST_FRAMEWORK = {
  'DEFAULT_AUTHENTICATION_CLASSES': [
          'rest_framework_simplejwt.authentication.JWTAuthentication',
         'rest_framework.authentication.SessionAuthentication',
-         'rest_framework.authentication.TokenAuthentication',
+        #  'rest_framework.authentication.TokenAuthentication',
     ],
 
     'DEFAULT_PERMISSION_CLASSES': [
@@ -85,6 +85,25 @@ MIDDLEWARE = [
 ]
 
 CORS_ORIGIN_ALLOW_ALL = True
+
+# CORS_ALLOW_METHODS = [
+#     'GET',
+#     'POST',
+#     'PUT',
+#     'PATCH',
+#     'DELETE',
+#     'OPTIONS',  # Required for preflight requests
+# ]
+
+
+# CORS_ALLOW_HEADERS = [
+#     'Accept',
+#     'Accept-Encoding',
+#     'Authorization',
+#     'Content-Type',
+#     'Origin',
+#     'User-Agent',
+# ]
 
 
 
@@ -114,7 +133,7 @@ WSGI_APPLICATION = 'support.wsgi.application'
 
 DATABASES = {
     'default': {
-            'ENGINE': 'django.db.backends.mysql',
+        'ENGINE': 'django.db.backends.mysql',
         'NAME': 'customer_support_system',
         'USER':'root',
         'PASSWORD':'',
@@ -122,7 +141,7 @@ DATABASES = {
         'PORT':3306
     },
 
-    'OPTIONS'  : { 'init_command' : 'SET storage_engine=InnoDB', }
+    # 'OPTIONS'  : { 'init_command' : 'SET storage_engine=InnoDB', }
 }
 
 
