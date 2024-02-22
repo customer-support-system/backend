@@ -2,6 +2,7 @@ from django.db import models
 from django.contrib.auth.models import AbstractUser,BaseUserManager,Permission,Group
 from django.contrib.auth.hashers import make_password
 
+
 class CustomUser(AbstractUser):
     
     pass
@@ -22,6 +23,7 @@ class CustomUserManager(BaseUserManager):
         if extra_fields.get('is_superuser') is not True:
             raise ValueError('Superuser must have is_superuser=True.')
         return self.create_user(username, password, **extra_fields)
+    
 class IssueQuerySet(models.QuerySet):
     def without_solutions(self):
         return self.annotate(solution_count=models.Count('solution')).filter(solution_count=0)

@@ -211,14 +211,20 @@ from rest_framework_simplejwt.views import TokenObtainPairView
 from .serializers import CustomTokenObtainPairSerializer
 
 
+
 from .models import Issues, Levels, Solution, Staff
 from .serializers import (
     ComplaintSerializer, LevelSerializer, SolutionSerializer, StaffSerializer
 )
 from rest_framework.pagination import PageNumberPagination
+from django_filters import rest_framework as filters
 
 
-
+class ComplaintFilter(filters.FilterSet):
+    
+    class Meta:
+        model = Issues
+        fields = ['email','status'] 
 
 class CustomPagination(PageNumberPagination):
     page_size = 10  
@@ -226,38 +232,27 @@ class CustomPagination(PageNumberPagination):
     max_page_size = 1000  
 
 
-
-
 class ComplaintViewSet(viewsets.ModelViewSet):
     queryset = Issues.objects.all()
     serializer_class = ComplaintSerializer
     permission_classes = [AllowAny]
     pagination_class = CustomPagination
+    filterset_class = ComplaintFilter
+    
 
     def get_queryset(self):
-        queryset = super().get_queryset()
-        # Filter complaints by status
-        status_filter = self.request.query_params.get('status', None)
-        if status_filter:
-            queryset = queryset.filter(status=status_filter)
-        return queryset
+        queryset = super().get_queryset()#it returns the initial queryset of the parent class
+        return self.filterset_class(self.request.GET, queryset=queryset).qs
+    #applies the filters based on the provided
 
-
-
-    @action(detail=False)
-    def without_solutions(self, request):
-        queryset = Issues.objects.filter(status__in=['pending', 'answered']).exclude(solution__isnull=False)
-        page = self.paginate_queryset(queryset)
+    def list(self, request, *args, **kwargs):
+        queryset = self.filter_queryset(self.get_queryset())
+        filtered_queryset = queryset.filter(status='pending')  # Filtering by 'status' field
+        
+        page = self.paginate_queryset(filtered_queryset)
         serializer = self.get_serializer(page, many=True)
         return self.get_paginated_response(serializer.data)
-
-    @action(detail=False)
-    def pending(self, request):
-        queryset = Issues.objects.filter(status='pending')
-        page = self.paginate_queryset(queryset)
-        serializer = self.get_serializer(page, many=True)
-        return self.get_paginated_response(serializer.data)
-
+    
 
 class LevelViewSet(viewsets.ModelViewSet):
     queryset = Levels.objects.all()
@@ -280,7 +275,6 @@ class StaffViewSet(viewsets.ModelViewSet):
 class CustomTokenObtainPairView(TokenObtainPairView):
     serializer_class = CustomTokenObtainPairSerializer
 
-    
 
 
     

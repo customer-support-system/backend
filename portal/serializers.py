@@ -55,6 +55,8 @@ class CustomTokenObtainPairSerializer(serializers.Serializer):
                 raise serializers.ValidationError(msg, code='authorization')
 
             refresh = RefreshToken.for_user(user)
+            #token expiration
+            refresh.access_token.set_exp(86400) #set for 24hrs
             token = {
                 'refresh': str(refresh),
                 'access': str(refresh.access_token),
