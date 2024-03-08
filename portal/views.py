@@ -202,29 +202,23 @@
 # using viewsets
 
 from rest_framework import viewsets
-from rest_framework.decorators import action
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated,AllowAny
 from rest_framework import status
 from rest_framework.request import Request
 from rest_framework_simplejwt.views import TokenObtainPairView
 from .serializers import CustomTokenObtainPairSerializer
+from .models import Issues, Levels, Solution, Staff,CustomUser
 
 
-
-from .models import Issues, Levels, Solution, Staff
 from .serializers import (
-    ComplaintSerializer, LevelSerializer, SolutionSerializer, StaffSerializer
+    ComplaintSerializer, LevelSerializer, SolutionSerializer, StaffSerializer,CustomUserSerializer
 )
 from rest_framework.pagination import PageNumberPagination
-from django_filters import rest_framework as filters
+from django_filters.rest_framework import DjangoFilterBackend
+from portal import constants
 
 
-class ComplaintFilter(filters.FilterSet):
-    
-    class Meta:
-        model = Issues
-        fields = ['email','status'] 
 
 class CustomPagination(PageNumberPagination):
     page_size = 10  
@@ -233,30 +227,38 @@ class CustomPagination(PageNumberPagination):
 
 
 class ComplaintViewSet(viewsets.ModelViewSet):
-    queryset = Issues.objects.all()
+    queryset = Issues.objects.order_by('-created_at')
     serializer_class = ComplaintSerializer
     permission_classes = [AllowAny]
     pagination_class = CustomPagination
-    filterset_class = ComplaintFilter
-    
+    filter_backends = [DjangoFilterBackend]
+    filterset_fields = {
+        'email': ['exact'],
+        'status': ['exact'],  
+    }
 
-    def get_queryset(self):
-        queryset = super().get_queryset()#it returns the initial queryset of the parent class
-        return self.filterset_class(self.request.GET, queryset=queryset).qs
-    #applies the filters based on the provided
+    # def list(self, request, *args, **kwargs):
+    #     user = request.user
+    #     if user.is_staff:
+    #         complaints = Issues.objects.filter(level=user.staff.level).order_by('-created_at')
+    #         serializer = self.get_serializer(complaints, many=True)
+    #         return Response(serializer.data)
+    #     else:
+    #         return Response({'error': 'User is not a staff member'}, status=status.HTTP_403_FORBIDDEN)
 
-    def list(self, request, *args, **kwargs):
-        queryset = self.filter_queryset(self.get_queryset())
-        filtered_queryset = queryset.filter(status='pending')  # Filtering by 'status' field
-        
-        page = self.paginate_queryset(filtered_queryset)
-        serializer = self.get_serializer(page, many=True)
-        return self.get_paginated_response(serializer.data)
-    
+
+class CustomUserViewSet(viewsets.ModelViewSet):
+    queryset = CustomUser.objects.all()
+    serializer_class = CustomUserSerializer
+
+    def perform_create(self, serializer):
+        serializer.save(is_staff=True)
+
 
 class LevelViewSet(viewsets.ModelViewSet):
     queryset = Levels.objects.all()
     serializer_class = LevelSerializer
+    pagination_class=CustomPagination
 
 
 class SolutionViewSet(viewsets.ModelViewSet):
@@ -265,11 +267,26 @@ class SolutionViewSet(viewsets.ModelViewSet):
     permission_classes = [IsAuthenticated]
     pagination_class=CustomPagination
 
+    def create(self, request, *args, **kwargs):
+        serializer = self.get_serializer(data=request.data)
+        if serializer.is_valid():
+            # Save the solution
+            self.perform_create(serializer)
+            # Get the related issue and update its status to 'answered'
+            issue = serializer.validated_data['issue']
+            issue.status = constants.COMPLAINT_STATUS_ANSWERED
+            issue.save()
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        else:
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        
+
+        
 
 class StaffViewSet(viewsets.ModelViewSet):
     queryset = Staff.objects.all()
     serializer_class = StaffSerializer
-    pagination_class=CustomPagination
+    pagination_class = CustomPagination
 
 
 class CustomTokenObtainPairView(TokenObtainPairView):

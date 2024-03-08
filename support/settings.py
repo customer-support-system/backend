@@ -34,6 +34,7 @@ ALLOWED_HOSTS = ['*']
 INSTALLED_APPS = [
     'portal',
     'rest_framework',
+    'django_filters',
     'rest_framework_simplejwt',
     'django.contrib.admin',
     'django.contrib.auth',
@@ -86,24 +87,24 @@ MIDDLEWARE = [
 
 CORS_ORIGIN_ALLOW_ALL = True
 
-# CORS_ALLOW_METHODS = [
-#     'GET',
-#     'POST',
-#     'PUT',
-#     'PATCH',
-#     'DELETE',
-#     'OPTIONS',  # Required for preflight requests
-# ]
+CORS_ALLOW_METHODS = [
+    'GET',
+    'POST',
+    'PUT',
+    'PATCH',
+    'DELETE',
+    'OPTIONS',  # Required for preflight requests
+]
 
 
-# CORS_ALLOW_HEADERS = [
-#     'Accept',
-#     'Accept-Encoding',
-#     'Authorization',
-#     'Content-Type',
-#     'Origin',
-#     'User-Agent',
-# ]
+CORS_ALLOW_HEADERS = [
+    'Accept',
+    'Accept-Encoding',
+    'Authorization',
+    'Content-Type',
+    'Origin',
+    'User-Agent',
+]
 
 
 
