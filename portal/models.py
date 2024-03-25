@@ -1,10 +1,27 @@
+"""
+ticket number
+feedback
+time when it was created
+report to admins about who forwarded the complaints and why??
+"""
 from django.db import models
-from django.contrib.auth.models import AbstractUser,BaseUserManager,Permission,Group
+from django.contrib.auth.models import AbstractUser,BaseUserManager
 from django.contrib.auth.hashers import make_password
 from django.utils import timezone
 from portal import constants
 
 
+class Levels(models.Model):
+    order = models.IntegerField(unique=True, null=True, blank=True)
+    name=models.CharField(max_length=255)
+    
+
+    def __str__(self):
+      return self.name
+    
+    class Meta:
+        ordering = ['order']
+    
 
 
 class CustomUserManager(BaseUserManager):
@@ -27,43 +44,29 @@ class CustomUserManager(BaseUserManager):
     
 
 class CustomUser(AbstractUser):
-    # objects = CustomUserManager()
-    pass
+
+      level = models.ForeignKey(Levels, on_delete=models.SET_NULL, null=True, blank=True)
    
-    
 
-
-class Levels(models.Model):
-    name=models.CharField(max_length=255)
-    
-
-    def __str__(self):
-      return self.name
-    
-
-    
 class Issues(models.Model):
     institution_name=models.CharField(max_length=100)
     email=models.EmailField()
     issue=models.CharField(max_length=200)
-    level = models.ForeignKey(Levels, on_delete=models.SET_NULL, null=True, blank=True,default=8)
+    level = models.ForeignKey(Levels, on_delete=models.SET_NULL, null=True, blank=True)
     status = models.IntegerField(choices=constants.COMPLAINT_STATUS_CHOICES,
                                  default=constants.COMPLAINT_STATUS_PENDING)
-    created_at = models.DateTimeField(default=timezone.now)
+    created_at = models.DateTimeField(auto_now_add=True)
     
     def __str__(self):
      return self.institution_name
     
-    def forward_to_next_level(self, next_level_number):
-        try:
-            next_level = Levels.objects.get(level_number=next_level_number)
-            self.level = next_level
-            self.save()
-            return True
-        except Levels.DoesNotExist:
-            return False
+    def save(self, **kwargs) -> None:
+        if not self.level:
+            first_level = Levels.objects.first()
+            self.level = first_level
+        return super().save(**kwargs)
     
-    
+
     
     class Meta:
         ordering = ['-created_at']

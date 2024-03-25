@@ -10,15 +10,16 @@ from portal import constants
 class ComplaintSerializer(serializers.ModelSerializer):
     class Meta:
         model=Issues
-        fields=["id","institution_name","email","issue","created_at"]
+        fields=serializers.ALL_FIELDS
         read_only_fields = ["status"]
+        
 
 
 class LevelSerializer(serializers.ModelSerializer):
 
     class Meta:
         model=Levels
-        fields=["id","name"]
+        fields=serializers.ALL_FIELDS
 
 
 class SolutionSerializer(serializers.ModelSerializer):
@@ -26,13 +27,14 @@ class SolutionSerializer(serializers.ModelSerializer):
     class Meta:
         model=Solution
         fields=['id','issue','answer']
+        
 
 
 
 class UserSerializer(serializers.ModelSerializer):
     class Meta:
         model = CustomUser
-        fields = ['username', 'password','is_staff']
+        fields = ['id','username', 'password','is_staff','is_superuser']
         extra_kwargs = {'password': {'write_only': True}}
 
         # password hashing
@@ -49,18 +51,20 @@ class CustomUserSerializer(serializers.ModelSerializer):
 
 
 
-
 class StaffSerializer(serializers.ModelSerializer):
     user = UserSerializer()
-    level = LevelSerializer() 
+    level_details = LevelSerializer(source="level", read_only=True) 
     
     class Meta:
         model = Staff
-        fields = ['user', 'level']
+        fields = ['id','user','level' ,'level_details']
 
     def create(self, validated_data):
         user_data = validated_data.pop('user')
-        level_data = validated_data.pop('level') 
+        level_data = validated_data.get('level') 
+
+        if level_data is None:
+            raise serializers.ValidationError("Level data is required.")
         
         # Create user
         user_serializer = UserSerializer(data=user_data)
@@ -69,37 +73,11 @@ class StaffSerializer(serializers.ModelSerializer):
         else:
             raise serializers.ValidationError(user_serializer.errors)
         
-        # Create level
-        level_serializer = LevelSerializer(data=level_data)
-        if level_serializer.is_valid():
-            level = level_serializer.save()
-        else:
-            raise serializers.ValidationError(level_serializer.errors)
         
         # Create staff
-        staff = Staff.objects.create(user=user, level=level, **validated_data)
+        staff = Staff.objects.create(user=user, level=level_data)
         return staff
 
-
-
-
-# class StaffSerializer(serializers.ModelSerializer):
-#     user = UserSerializer()
-#     level = LevelSerializer() 
-#     class Meta:
-#         model = Staff
-#         fields = ['user','level']
-
-#     def create(self, validated_data):
-#         user_data = validated_data.pop('user')
-#         level_data = validated_data.pop('level') 
-#         user_serializer = UserSerializer(data=user_data)
-#         if user_serializer.is_valid():
-#             user = user_serializer.save(is_staff=True)  
-#             staff = Staff.objects.create(user=user, **validated_data)
-#             return staff
-#         else:
-#             raise serializers.ValidationError(user_serializer.errors)
 
 
 class CustomTokenObtainPairSerializer(serializers.Serializer):
@@ -127,7 +105,7 @@ class CustomTokenObtainPairSerializer(serializers.Serializer):
             token = {
                 'refresh': str(refresh),
                 'access': str(refresh.access_token),
-                # 'is_superuser': user.is_superuser  # Include is_superuser field in response
+                'is_superuser': user.is_superuser  # Include is_superuser field in response
             }
             return token
         else:

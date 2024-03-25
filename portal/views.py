@@ -209,15 +209,14 @@ from rest_framework.request import Request
 from rest_framework_simplejwt.views import TokenObtainPairView
 from .serializers import CustomTokenObtainPairSerializer
 from .models import Issues, Levels, Solution, Staff,CustomUser
-
-
 from .serializers import (
     ComplaintSerializer, LevelSerializer, SolutionSerializer, StaffSerializer,CustomUserSerializer
 )
 from rest_framework.pagination import PageNumberPagination
 from django_filters.rest_framework import DjangoFilterBackend
 from portal import constants
-
+from .filters import LevelFilterBackend
+from rest_framework.decorators import action
 
 
 class CustomPagination(PageNumberPagination):
@@ -231,20 +230,8 @@ class ComplaintViewSet(viewsets.ModelViewSet):
     serializer_class = ComplaintSerializer
     permission_classes = [AllowAny]
     pagination_class = CustomPagination
-    filter_backends = [DjangoFilterBackend]
-    filterset_fields = {
-        'email': ['exact'],
-        'status': ['exact'],  
-    }
-
-    # def list(self, request, *args, **kwargs):
-    #     user = request.user
-    #     if user.is_staff:
-    #         complaints = Issues.objects.filter(level=user.staff.level).order_by('-created_at')
-    #         serializer = self.get_serializer(complaints, many=True)
-    #         return Response(serializer.data)
-    #     else:
-    #         return Response({'error': 'User is not a staff member'}, status=status.HTTP_403_FORBIDDEN)
+    filter_backends = [LevelFilterBackend,DjangoFilterBackend]
+    filterset_fields = ['email','status']
 
 
 class CustomUserViewSet(viewsets.ModelViewSet):
@@ -282,16 +269,16 @@ class SolutionViewSet(viewsets.ModelViewSet):
         
 
         
-
 class StaffViewSet(viewsets.ModelViewSet):
     queryset = Staff.objects.all()
     serializer_class = StaffSerializer
     pagination_class = CustomPagination
 
 
+
 class CustomTokenObtainPairView(TokenObtainPairView):
     serializer_class = CustomTokenObtainPairSerializer
-
+    # extract validated user, add their user id in the response along the access, token and is user super user
 
 
     
